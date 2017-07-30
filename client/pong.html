@@ -1,0 +1,749 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>PONG!!</title>
+	<script
+	  src="https://code.jquery.com/jquery-3.2.1.min.js"
+	  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+	  crossorigin="anonymous">
+	 </script>
+	<style>
+		body{
+			background-color: linen;
+			margin-left: 50;
+			/*filter: blur(20px);*/
+		}
+
+		.blur{
+			filter: blur(20px);
+
+			
+		}
+		#numCanvas{
+			margin-left: 450px;
+			visibility: hidden;
+		}
+		h3{
+			display: inline-block;
+		}
+		#userScore{
+			margin: 0px;
+			font-size: 40px;
+			text-align: left;
+		}
+		#compScore{
+			margin: 0px;
+
+			font-size: 40px;
+			text-align: left;
+		}
+
+		#movingPong{
+			color:red;
+			font-size: 20px;
+		}
+/*		#leftBlock{
+			float: left;
+			display: inline-block;
+			width: 10px;
+			height: 90px;
+			background-color: grey;
+		}*/
+		#leftPaddle{
+			margin-top: 20px;
+			float: left;
+		}
+		#centerBlock{
+			display: inline-block;
+			width:680;
+			height: 50px;
+		}
+		#rightPaddle{
+			margin-top: -20px;
+
+			float: right;
+			margin-left: 700px;
+		}
+
+		#pongContainer{
+			width: 800px;
+			height: 90px;
+			display: inline-block;
+			/*background-color: lightgrey;*/
+
+		}
+		#canvasHolderDiv{
+			width: 1000px;
+			height:800px;
+			background-color: aquamarine; 
+			text-align: center;
+			border: solid darkblue 5px;
+
+		}
+		#gameCanvas{
+			margin-top: 100px
+
+		}
+
+
+	}
+
+
+	</style>
+
+
+
+<script>
+var paused = false;
+
+
+var canvas;
+var canvasContext;
+var ballx = 50;
+var bally = 250; 
+var ballSpeedX = 10;
+var ballSpeedY = 5;
+var movePositive = true;
+var paddle1Y = 250;
+var paddle2Y = 250;
+var userScore = 0;
+var computerScore = -1;
+//Remember constants are all caps
+const PADDLE_HEIGHT = 100;
+const PADDLE_THICKNESS = 10;
+const COMPUTER_SPEED = 5;
+const QUIT_SCORE = 15;
+
+
+
+
+
+//Load setup after window has completely loaded
+	$(document).ready(function(){
+	var timeLeft ='3';
+
+
+
+   			// var filterVal = 'blur(' + 10 + 'px)';
+    		// $('#canvasHolderDiv').css({
+		    //     'filter':filterVal,
+		    //     'webkitFilter':filterVal,
+		    //     'mozFilter':filterVal,
+		    //     'oFilter':filterVal,
+		    //     'msFilter':filterVal,
+		    //     'transition':'all 1s ease-out',
+		    //     '-webkit-transition':'all 1s ease-out',
+		    //     '-moz-transition':'all 1s ease-out',
+		    //     '-o-transition':'all 1s ease-out'
+   			//  });
+
+
+
+
+
+
+
+
+
+
+		setTimeout(function(){
+			$('body').addClass('.blur')
+		},2000)
+		console.log('Running Jquery document.ready');
+		$("#movingPong").animate(
+		 	{marginLeft: "+630px",
+			},500);
+		$('#leftPaddle').animate(
+			{marginTop: "+50px"
+			}, 500);
+		$('#rightPaddle').animate(
+			{marginTop: "-50px"
+			}, 500)
+		$("#movingPong").animate(
+		 	{marginLeft: "10px",
+			},500);
+		$('#leftPaddle').animate(
+			{marginTop: "0px"
+			}, 500)
+		$('#rightPaddle').animate(
+			{marginTop: "30px"
+			}, 500)
+			// $('#pauseButton').click(function(){
+			// 	console.log(pause);
+			// 	alert('you clicked the pause button')
+			// 	pause =true;
+			// 	console.log(pause);
+			// })
+
+	setInterval(function(){
+		var rndSpeed = Math.floor(Math.random()*1000 + 600);
+
+		 $("#movingPong").animate(
+		 	{marginLeft: "+630px",
+			},rndSpeed);
+		$('#leftPaddle').animate(
+			{marginTop: "+50px"
+			}, 800);
+		$('#rightPaddle').animate(
+			{marginTop: "-50px"
+			}, 500)
+
+		$("#movingPong").animate(
+		 	{marginLeft: "10px",
+			},rndSpeed);
+		$('#leftPaddle').animate(
+			{marginTop: "0px"
+			}, 800)
+		$('#rightPaddle').animate(
+			{marginTop: "+30px"
+			}, 700)
+
+
+
+
+	},1000);
+
+
+
+
+
+
+
+
+
+		console.log('On load, timeLeft is ', timeLeft)
+		console.log('Page loaded.')
+		// var readyText = 'First to ' + QUIT_SCORE + ' wins. Ready?'
+		// var ready = window.confirm(readyText);
+		// if(ready==false){
+		// 	alert("Sorry you don't feel like playing. Reload to try again!")
+		// 	end;
+		// }
+		// var filterVal = 'blur(' + 10 + 'px)';
+  //   	$('#canvasHolderDiv').css({
+		//         'filter':filterVal,
+		//         'webkitFilter':filterVal,
+		//         'mozFilter':filterVal,
+		//         'oFilter':filterVal,
+		//         'msFilter':filterVal,
+		//         'transition':'all 1s ease-out',
+		//         '-webkit-transition':'all 1s ease-out',
+		//         '-moz-transition':'all 1s ease-out',
+		//         '-o-transition':'all 1s ease-out'
+  //  		});
+
+//setup eventlisteners
+		$('#instructions').click(function(evt){
+				event.preventDefault();
+				alert('The ball is served from the middle of the court after a 3 second countdown. Keep your mouse aproximately over the white center line down the middle of the green court. Your paddle is the left one, while the right paddle is the computer. As you move your mouse up and down, your paddle will follow! First to 15 wins.');
+
+		})
+		document.getElementById("pauseButton").addEventListener("click", function(){
+			paused = true ;
+		    console.log('paused is ' + paused);
+		});
+		document.getElementById("resumeButton").addEventListener("click", function(){
+			paused = false ;
+		    console.log('paused is ' + paused);
+		});
+
+
+//setup reference to computer and player score sections. would be easier with jquery.
+		compScoreSection = document.getElementById('compScore');
+		userScoreSection = document.getElementById('userScore');
+		wholePage = document.getElementById('wholeShebang');
+		leftPaddle = document.getElementById('leftPaddle');
+		var framesPerSecond = 33;
+
+//Setup Canvas
+		canvas = document.getElementById('gameCanvas');
+		numCanvas = document.getElementById('numCanvas');
+
+		canvasContext = canvas.getContext('2d');
+		canvasNumContext = numCanvas.getContext('2d');
+
+
+
+//second canvas fooling around
+	canvasNumContext.fillStyle = 'linen';
+
+	canvasNumContext.fillRect(0, 0, 200, 200);
+
+
+
+	
+// setINterval(function)
+		ballReset();
+		moveEverything
+		drawEverything();
+
+		// break();
+
+		var readyText = 'First to ' + QUIT_SCORE + ' wins. Ready?'
+		var ready = window.confirm(readyText);
+		if(ready==false){
+			alert("Sorry you don't feel like playing. Reload to try again!")
+			end;
+		}else{
+
+
+			initialServe();
+
+
+
+			setTimeout(function(){
+					setInterval(function(){
+						console.log('In the set interval, paused is', paused, 'and timeLeft is', timeLeft);
+						if(paused ==false){  
+							moveEverything();
+							computerMovement();
+							drawEverything();
+						}
+					}, 1000/framesPerSecond);
+
+
+			},5000)
+		}
+//first serve specialized blurs etc.
+	function initialServe(){
+
+			// ballSpeedX = 10;
+			// ballSpeedY = 0;
+			// ballx = canvas.width/2;
+			// bally = canvas.height/2;
+			// paused= false;
+
+			countdown();
+
+
+
+
+	}
+		
+
+//add eventlistener for mouse movement
+		canvas.addEventListener('mousemove', function(evt){
+			var mousePos = calculateMousePosition(evt);
+			paddle1Y = mousePos.y;
+		})
+
+
+//figure out where the mouse is.
+	function calculateMousePosition(evt){
+		var rect = canvas.getBoundingClientRect();
+		var root = document.documentElement;
+		var mouseX = evt.clientX - rect.left - root.scrollLeft;
+		var mouseY = evt.clientY - rect.top - root.scrollTop;
+		return {
+
+			x:mouseX,
+			y:mouseY
+		}
+	}
+//Reset ball if it goes off the left side. Adds score to computer
+	function ballReset(){
+			ballSpeedX = 10;
+			ballSpeedY = 0;
+			ballx = canvas.width/2;
+			bally = canvas.height/2;
+			computerScore ++;
+			compScoreSection.innerHTML= 'Computer Score: ' + computerScore;
+
+			if(computerScore > QUIT_SCORE){
+				computerScore = 0;
+
+				alert('Computer wins!')
+				location.reload();
+			}
+			compScoreSection.innerHTML= 'Computer Score: ' + computerScore;
+			paused = true ;
+
+			countdown();
+
+
+
+
+		
+	}
+//Reset ball if goes out on right. Add score to human
+	function ballReset2(){
+
+			ballSpeedX = 10;
+			ballSpeedY = 0;
+			ballx = canvas.width/2;
+			bally = canvas.height/2;
+			userScore ++;
+			userScoreSection.innerHTML= 'User Score: ' + userScore;
+
+			if(userScore > QUIT_SCORE){
+				userScore = 0;
+
+				alert('You won!')
+				location.reload();
+
+				// break;
+			}
+		userScoreSection.innerHTML= 'Your Score: ' + userScore;
+
+//Countdown
+
+			paused = true;
+			countdown();
+
+
+
+
+		// $("#canvasHolderDiv").animate(
+		//  	{filter: "blur(10px)",
+		// 	},200);
+		// paused=false;
+
+	};
+
+
+//seperate blur and countdown into a function to save code lines.
+	function countdown(){
+		// $("#canvasHolderDiv").animate(
+		//  	{filter: "blur(10px)",
+		// 	},500);
+
+	timeLeft = '3';
+
+			var filterVal = 'blur(' + 10 + 'px)';
+	    	$('#numCanvas').css({
+	    		'visibility': 'visible',
+	    	})
+
+	    	$('#canvasHolderDiv').css({
+			        'filter':filterVal,
+			        'webkitFilter':filterVal,
+			        'mozFilter':filterVal,
+			        'oFilter':filterVal,
+			        'msFilter':filterVal,
+			        'transition':'all .25s ease-out',
+			        '-webkit-transition':'all .25s ease-out',
+			        '-moz-transition':'all .25s ease-out',
+			        '-o-transition':'all .25s ease-out'
+	   		});
+
+
+
+
+
+		setTimeout(function(){
+			$('#numCanvas').css
+				console.log('In countdown');
+					// paused = false;
+					timeLeft = '3';
+					canvasNumContext.font = '200px Arial';
+					console.log('timeLeft is',timeLeft);
+					canvasNumContext.fillStyle = 'red';
+					canvasNumContext.fillText(timeLeft, 5, 150);
+					var filterVal = 'blur('+"0px"+')';
+			    	$('#canvasHolderDiv').css({
+					        'filter':filterVal,
+					        'webkitFilter':filterVal,
+					        'mozFilter':filterVal,
+					        'oFilter':filterVal,
+					        'msFilter':filterVal,
+					        'transition':'all 3s ease-out',
+					        '-webkit-transition':'all 3s ease-out',
+					        '-moz-transition':'all 3s ease-out',
+					        '-o-transition':'all 3s ease-out'
+			   		});
+			   		setTimeout(function(){
+
+							console.log('timeLeft',timeLeft);
+
+							canvasNumContext.fillStyle = 'linen';
+
+
+							canvasNumContext.fillText(timeLeft, 5, 150);
+							drawNet();
+
+							timeLeft = '2';
+							console.log('timeLeft',timeLeft);
+
+							canvasNumContext.fillStyle = 'red';
+							canvasNumContext.fillText(timeLeft, 5, 150);
+							// $('#canvasHolderDiv').css('filter', 'blur(7px)');
+
+
+							// canvasContext.fillText(timeLeft, 350, 150);
+							setTimeout(function(){
+
+									canvasNumContext.fillStyle = 'linen';
+
+									canvasNumContext.fillText(timeLeft, 5, 150);
+									drawNet()
+									timeLeft = '1'
+									console.log('timeLeft is',timeLeft);
+									canvasNumContext.fillStyle = 'red';
+									canvasNumContext.fillText(timeLeft, 5, 150);
+									setTimeout(function(){
+										canvasNumContext.fillStyle = 'linen';
+										canvasNumContext.fillText(timeLeft, 5, 150);
+										console.log('done');
+										$('#numCanvas').css({
+								    		'visibility': 'hidden',
+								    	})
+
+										paused=false;
+
+
+									},1000)
+
+
+
+							},1000)
+
+
+
+			   		},1000)
+
+
+
+
+		},2000)
+
+
+	}
+
+// This isn't very DRY. Should create a new method to call and simplify the look and size of this code.	Move into jquery for animation	
+			// $('#canvasHolderDiv').css('filter', 'blur(5px)');
+
+//below is really a better way to animate the blur. Need to redo in this style
+			// var filterVal = 'blur(' + 10 + 'px)';
+    		// $('#canvasHolderDiv').css({
+		    //     'filter':filterVal,
+		    //     'webkitFilter':filterVal,
+		    //     'mozFilter':filterVal,
+		    //     'oFilter':filterVal,
+		    //     'msFilter':filterVal,
+		    //     'transition':'all 3s ease-out',
+		    //     '-webkit-transition':'all 3s ease-out',
+		    //     '-moz-transition':'all 3s ease-out',
+		    //     '-o-transition':'all 3s ease-out'
+   			//  });
+
+
+
+
+			// 	$('#canvasHolderDiv').css('filter', 'blur(10px)');
+
+
+
+
+				// setTimeout(function(){
+
+				// 	console.log('timeLeft is first',timeLeft);
+
+				// 	canvasContext.fillStyle = 'darkgreen';
+
+
+				// 	canvasContext.fillText(timeLeft, 350, 150);
+				// 	drawNet();
+
+				// 	timeLeft = '2';
+				// 	canvasContext.fillStyle = 'white';
+				// 	canvasContext.fillText(timeLeft, 350, 150);
+				// 	// $('#canvasHolderDiv').css('filter', 'blur(7px)');
+
+
+				// canvasContext.fillText(timeLeft, 350, 150);
+				// },2000);
+				// setTimeout(function(){
+				// 	canvasContext.fillStyle = 'darkgreen';
+
+				// 	canvasContext.fillText(timeLeft, 350, 150);
+				// 	drawNet()
+				// 	timeLeft = '1'
+				// 	console.log('timeLeft is',timeLeft);
+				// 	canvasContext.fillStyle = 'white';
+				// 	canvasContext.fillText(timeLeft, 350, 150);
+				// 	// $('#canvasHolderDiv').css('filter', 'blur(3px)');
+
+				// },2000)
+				// setTimeout(function(){
+				// 	canvasContext.fillStyle = 'white';
+				// 	canvasContext.fillText(timeLeft, 350, 150);
+				// 	timeLeft = ''
+				// 	canvasContext.fillStyle = 'green';
+				// 	canvasContext.fillText(timeLeft, 350, 150);
+				// 	// $('#canvasHolderDiv').css('filter', 'blur(0px)');
+
+				// 	paused = false;
+				// },3000)
+			
+
+
+
+
+//Computer move controller
+	function computerMovement(){
+		if(paddle2Y < bally){
+			paddle2Y += COMPUTER_SPEED;
+		}else{
+
+			paddle2Y -=COMPUTER_SPEED;
+		}
+	}
+
+
+//move everything.
+	function moveEverything(){
+		if(movePositive){
+				ballx= ballx +ballSpeedX;
+				bally = bally+ ballSpeedY;
+
+		}else{
+				ballx= ballx -ballSpeedX;
+				bally = bally - ballSpeedY;
+		}
+	}
+
+//Draw athe screen
+	function drawEverything(){
+		// console.log(timeLeft);
+
+// Main game canvas
+		colorRect(0,0, canvas.width, canvas.height, 'darkgreen');
+
+		//left paddle
+		colorRect(0,paddle1Y-(PADDLE_HEIGHT/2), PADDLE_THICKNESS, PADDLE_HEIGHT, 'red');
+
+		//right paddle
+		colorRect(canvas.width -PADDLE_THICKNESS, paddle2Y-(PADDLE_HEIGHT/2), PADDLE_THICKNESS, PADDLE_HEIGHT, 'red');
+		drawNet();
+
+
+
+// check to see if ball is on the court and reverse if at edge
+		if(ballx >= canvas.width-20){
+
+			if(bally>=paddle2Y-50 && bally <= (paddle2Y +PADDLE_HEIGHT/2)){
+
+				ballSpeedX = -(ballSpeedX +2);
+				ballSpeedY = ballSpeedY + (Math.random() < 0.5 ? -1 : 1)*(Math.random()*8);
+			}else{
+				ballReset2()
+
+
+			}
+
+
+		}else if(ballx <= 20){
+
+
+
+
+			//check if ball y is within paddle length
+			if(bally >= paddle1Y-50 && bally <= (paddle1Y +PADDLE_HEIGHT/2)){
+				ballSpeedX = -ballSpeedX;
+				ballSpeedY = ballSpeedY + (Math.random() < 0.5 ? -1 : 1)*(Math.random()*8);
+
+
+
+			}else{
+				// ballSpeedX = -ballSpeedX;
+				// alert('You lost!!');
+				ballReset();
+			}
+
+
+
+
+		}
+		//Do the same for y axis This could be shorter using an or rather than an else if
+		if(bally >= canvas.height-20){
+			ballSpeedY = -ballSpeedY;
+		}else if(bally <= 10){
+			ballSpeedY = -ballSpeedY;
+		}
+
+		colorCircle(ballx, bally, 10, 'yellow');
+
+				
+	}
+
+//draw the net
+	function drawNet(){
+		canvasContext.beginPath();
+		canvasContext.moveTo(400,0);
+		canvasContext.lineTo(400,600);
+		canvasContext.lineWidth = 5;
+		canvasContext.strokeStyle = 'white';
+		canvasContext.stroke();
+	}
+	//fill rectangles
+	function colorRect(leftX, topY, width, height, drawColor){
+		canvasContext.fillStyle = drawColor;
+		canvasContext.fillRect(leftX, topY, width, height);
+	}
+
+	//fill in circles
+	function colorCircle(centerX, centerY, radius, drawColor){
+//draw the ball requires  centerX of ball, centerY, the radius, 0 if for full circle(radians) and true reverses the part of the circle from false.
+
+		canvasContext.fillStyle = drawColor;
+		canvasContext.beginPath();
+		canvasContext.arc(centerX, centerY, radius, 0, Math.PI*2, true);
+		canvasContext.fill();
+
+	}
+
+
+
+})
+
+</script>
+</head>
+<body>
+<div id ='wholeShebang'>
+	<div id = 'pongContainer' >
+
+	<div id ='leftPaddle'><img src="/paddle.png" width = '50px' height = '50px' alt=""></div>
+
+		<div id ='centerBlock'>
+			<p id='movingPong'>PONG</p>
+		</div>	
+		<div id ='rightPaddle'><img src="/paddle.png" width = '50px' height = '50px' alt=""></div>
+
+
+		
+
+	</div>
+				<a id = 'instructions' href="">Click For Instructions</a>
+
+		<div>
+			<h3 id='userScore'>User Score: 0</h3><br>
+			<h3 id='compScore'>Computer Score: 0</h3>
+		</div>
+		<canvas id ='numCanvas' width='200' height = '200'></canvas>
+			<div id ='canvasHolderDiv'>
+
+		<!-- <div id ='courtLineDiv'> -->
+			<canvas id ='gameCanvas' width = '800' height='600'></canvas>
+			<br>
+			<button id = 'pauseButton'>Pause</button> ----
+			<button id = 'resumeButton'>Resume</button>
+		<!-- </div> -->
+	</div>
+</div>
+</body>
+
+<script>
+	}
+</script>
+</html>
+
+
+
+
+
+
