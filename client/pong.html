@@ -18,6 +18,16 @@
 			margin-left: 50;
 			/*filter: blur(20px);*/
 		}
+		#messages{
+			/*background-color: pink;*/
+			width: 100%;
+			height: 40px;
+			font-size: 20pt;
+			text-align: center;
+			/*visibility: hidden;*/
+			/*opacity: 0;*/
+
+		}
 
 		.blur{
 			filter: blur(20px);
@@ -27,6 +37,8 @@
 		#numCanvas{
 			margin-left: 450px;
 			visibility: hidden;
+			display:inline-block;
+			/*max-width: 40%;*/
 		}
 		h3{
 			display: inline-block;
@@ -35,6 +47,7 @@
 			margin: 0px;
 			font-size: 40px;
 			text-align: left;
+			display:inline-block;
 		}
 		#compScore{
 			margin: 0px;
@@ -47,13 +60,7 @@
 			color:red;
 			font-size: 20px;
 		}
-/*		#leftBlock{
-			float: left;
-			display: inline-block;
-			width: 10px;
-			height: 90px;
-			background-color: grey;
-		}*/
+
 		#leftPaddle{
 			margin-top: 20px;
 			float: left;
@@ -86,10 +93,15 @@
 
 		}
 		#gameCanvas{
-			margin-top: 100px
+			margin-top: 100px;
 
 		}
+		#upper{
 
+		}
+		#lower{
+
+		}
 
 	}
 
@@ -238,11 +250,20 @@ const QUIT_SCORE = 15;
   //  		});
 
 //setup eventlisteners
-		$('#instructions').click(function(evt){
-				event.preventDefault();
+		document.getElementById("instructions").addEventListener("click", function (){
+			event.preventDefault()
+				console.log('instructions clicked');
+				// event.preventDefault();
 				alert('The ball is served from the middle of the court after a 3 second countdown. Keep your mouse aproximately over the white center line down the middle of the green court. Your paddle is the left one, while the right paddle is the computer. As you move your mouse up and down, your paddle will follow! First to 15 wins.');
 
+
+
+
 		})
+		// $('#instructions').click(function(evt){
+			
+
+		// })
 		document.getElementById("pauseButton").addEventListener("click", function(){
 			paused = true ;
 		    console.log('paused is ' + paused);
@@ -251,6 +272,20 @@ const QUIT_SCORE = 15;
 			paused = false ;
 		    console.log('paused is ' + paused);
 		});
+
+//setup timed alert box functions
+	function customAlert(msg,duration)
+		{
+		 var styler = document.createElement("div");
+		  styler.setAttribute("style","border: solid 5px Red;width:auto;margin-top:1000;height:auto;top:50%;left:40%;background-color:#444;color:Silver");
+		 styler.innerHTML = "<h1>"+msg+"</h1>";
+		 setTimeout(function()
+		 {
+		   styler.parentNode.removeChild(styler);
+		 },duration);
+		 document.body.appendChild(styler);
+		 console.log('finished customAlert');
+	}
 
 
 //setup reference to computer and player score sections. would be easier with jquery.
@@ -267,7 +302,47 @@ const QUIT_SCORE = 15;
 		canvasContext = canvas.getContext('2d');
 		canvasNumContext = numCanvas.getContext('2d');
 
+// START canvas placement holding test setup
 
+	
+		// uppercanvas = document.getElementById('upper');
+		// lowercanvas = document.getElementById('lower');
+
+		// uppercanvasContext = uppercanvas.getContext('2d');
+		// lowercanvasContext = lowercanvas.getContext('2d');		
+		// draw them
+		// uppercanvasContext.fillStyle = 'red';
+		// uppercanvasContext.fillRect(0, 0, 600, 600);
+		// lowercanvasContext.fillStyle = 'blue';
+		// lowercanvasContext.fillRect(0, 0, 300, 300);
+	//visibility testing
+		$('#upper').css({
+			        // 'filter':filterVal,
+			        'visibility':'visible',
+
+	   		});
+		$('#upper').css({
+			        // 'filter':filterVal,
+			        'visibility':'hidden',
+
+	   		});
+		setTimeout(function(){
+			$('#upper').css({
+			        // 'filter':filterVal,
+			        'visibility':'visible',
+
+	  	 	});
+
+
+		}, 2000);
+
+
+
+
+
+
+
+// START canvas placement holding test setup
 
 //second canvas fooling around
 	canvasNumContext.fillStyle = 'linen';
@@ -312,11 +387,11 @@ const QUIT_SCORE = 15;
 //first serve specialized blurs etc.
 	function initialServe(){
 
-			// ballSpeedX = 10;
-			// ballSpeedY = 0;
-			// ballx = canvas.width/2;
-			// bally = canvas.height/2;
-			// paused= false;
+			ballSpeedX = 10;
+			ballSpeedY = 0;
+			ballx = canvas.width/2;
+			bally = canvas.height/2;
+			paused= false;
 
 			countdown();
 
@@ -353,6 +428,25 @@ const QUIT_SCORE = 15;
 			bally = canvas.height/2;
 			computerScore ++;
 			compScoreSection.innerHTML= 'Computer Score: ' + computerScore;
+			// alert('POINT: Computer');
+
+			$('#messages').html('Point goes to the computer');
+
+			setTimeout(function(){
+				$('#messages').html('');
+
+
+
+			},3000)
+
+
+			// customAlert("This custom alert box will be closed in 2 seconds",2000);
+
+
+
+
+
+
 
 			if(computerScore > QUIT_SCORE){
 				computerScore = 0;
@@ -379,6 +473,13 @@ const QUIT_SCORE = 15;
 			bally = canvas.height/2;
 			userScore ++;
 			userScoreSection.innerHTML= 'User Score: ' + userScore;
+			$('#messages').html('Point goes to the Human');
+			setTimeout(function(){
+				$('#messages').html('');
+
+
+
+			},3000)
 
 			if(userScore > QUIT_SCORE){
 				userScore = 0;
@@ -414,7 +515,7 @@ const QUIT_SCORE = 15;
 
 	timeLeft = '3';
 
-			var filterVal = 'blur(' + 10 + 'px)';
+			var filterVal = 'blur(' + 20 + 'px)';
 	    	$('#numCanvas').css({
 	    		'visibility': 'visible',
 	    	})
@@ -519,17 +620,17 @@ const QUIT_SCORE = 15;
 
 //below is really a better way to animate the blur. Need to redo in this style
 			// var filterVal = 'blur(' + 10 + 'px)';
-    		// $('#canvasHolderDiv').css({
-		    //     'filter':filterVal,
-		    //     'webkitFilter':filterVal,
-		    //     'mozFilter':filterVal,
-		    //     'oFilter':filterVal,
-		    //     'msFilter':filterVal,
-		    //     'transition':'all 3s ease-out',
-		    //     '-webkit-transition':'all 3s ease-out',
-		    //     '-moz-transition':'all 3s ease-out',
-		    //     '-o-transition':'all 3s ease-out'
-   			//  });
+   //  		$('#canvasHolderDiv').css({
+		 //        'filter':filterVal,
+		 //        'webkitFilter':filterVal,
+		 //        'mozFilter':filterVal,
+		 //        'oFilter':filterVal,
+		 //        'msFilter':filterVal,
+		 //        'transition':'all 3s ease-out',
+		 //        '-webkit-transition':'all 3s ease-out',
+		 //        '-moz-transition':'all 3s ease-out',
+		 //        '-o-transition':'all 3s ease-out'
+   // 			 });
 
 
 
@@ -539,46 +640,46 @@ const QUIT_SCORE = 15;
 
 
 
-				// setTimeout(function(){
+			// 	setTimeout(function(){
 
-				// 	console.log('timeLeft is first',timeLeft);
+			// 		console.log('timeLeft is first',timeLeft);
 
-				// 	canvasContext.fillStyle = 'darkgreen';
-
-
-				// 	canvasContext.fillText(timeLeft, 350, 150);
-				// 	drawNet();
-
-				// 	timeLeft = '2';
-				// 	canvasContext.fillStyle = 'white';
-				// 	canvasContext.fillText(timeLeft, 350, 150);
-				// 	// $('#canvasHolderDiv').css('filter', 'blur(7px)');
+			// 		canvasContext.fillStyle = 'darkgreen';
 
 
-				// canvasContext.fillText(timeLeft, 350, 150);
-				// },2000);
-				// setTimeout(function(){
-				// 	canvasContext.fillStyle = 'darkgreen';
+			// 		canvasContext.fillText(timeLeft, 350, 150);
+			// 		drawNet();
 
-				// 	canvasContext.fillText(timeLeft, 350, 150);
-				// 	drawNet()
-				// 	timeLeft = '1'
-				// 	console.log('timeLeft is',timeLeft);
-				// 	canvasContext.fillStyle = 'white';
-				// 	canvasContext.fillText(timeLeft, 350, 150);
-				// 	// $('#canvasHolderDiv').css('filter', 'blur(3px)');
+			// 		timeLeft = '2';
+			// 		canvasContext.fillStyle = 'white';
+			// 		canvasContext.fillText(timeLeft, 350, 150);
+			// 		// $('#canvasHolderDiv').css('filter', 'blur(7px)');
 
-				// },2000)
-				// setTimeout(function(){
-				// 	canvasContext.fillStyle = 'white';
-				// 	canvasContext.fillText(timeLeft, 350, 150);
-				// 	timeLeft = ''
-				// 	canvasContext.fillStyle = 'green';
-				// 	canvasContext.fillText(timeLeft, 350, 150);
-				// 	// $('#canvasHolderDiv').css('filter', 'blur(0px)');
 
-				// 	paused = false;
-				// },3000)
+			// 	canvasContext.fillText(timeLeft, 350, 150);
+			// 	},2000);
+			// 	setTimeout(function(){
+			// 		canvasContext.fillStyle = 'darkgreen';
+
+			// 		canvasContext.fillText(timeLeft, 350, 150);
+			// 		drawNet()
+			// 		timeLeft = '1'
+			// 		console.log('timeLeft is',timeLeft);
+			// 		canvasContext.fillStyle = 'white';
+			// 		canvasContext.fillText(timeLeft, 350, 150);
+			// 		// $('#canvasHolderDiv').css('filter', 'blur(3px)');
+
+			// 	},2000)
+			// 	setTimeout(function(){
+			// 		canvasContext.fillStyle = 'white';
+			// 		canvasContext.fillText(timeLeft, 350, 150);
+			// 		timeLeft = ''
+			// 		canvasContext.fillStyle = 'green';
+			// 		canvasContext.fillText(timeLeft, 350, 150);
+			// 		// $('#canvasHolderDiv').css('filter', 'blur(0px)');
+
+			// 		paused = false;
+			// 	},3000)
 			
 
 
@@ -615,10 +716,10 @@ const QUIT_SCORE = 15;
 		colorRect(0,0, canvas.width, canvas.height, 'darkgreen');
 
 		//left paddle
-		colorRect(0,paddle1Y-(PADDLE_HEIGHT/2), PADDLE_THICKNESS, PADDLE_HEIGHT, 'red');
+		colorRect(0,paddle1Y-(PADDLE_HEIGHT/2), PADDLE_THICKNESS, PADDLE_HEIGHT, 'white');
 
 		//right paddle
-		colorRect(canvas.width -PADDLE_THICKNESS, paddle2Y-(PADDLE_HEIGHT/2), PADDLE_THICKNESS, PADDLE_HEIGHT, 'red');
+		colorRect(canvas.width -PADDLE_THICKNESS, paddle2Y-(PADDLE_HEIGHT/2), PADDLE_THICKNESS, PADDLE_HEIGHT, 'white');
 		drawNet();
 
 
@@ -704,41 +805,52 @@ const QUIT_SCORE = 15;
 </script>
 </head>
 <body>
-<div id ='wholeShebang'>
-	<div id = 'pongContainer' >
+	<div id = 'messages'>Messages to go here...</div>
+	<div id ='wholeShebang'>
 
-	<div id ='leftPaddle'><img src="/paddle.png" width = '50px' height = '50px' alt=""></div>
+		<div id = 'pongContainer' >
 
-		<div id ='centerBlock'>
-			<p id='movingPong'>PONG</p>
-		</div>	
-		<div id ='rightPaddle'><img src="/paddle.png" width = '50px' height = '50px' alt=""></div>
+			<div id ='leftPaddle'><img src="/paddle.png" width = '50px' height = '50px' alt=""></div>
+
+				<div id ='centerBlock'>
+					<p id='movingPong'>PONG</p>
+				</div>	
+			<div id ='rightPaddle'><img src="/paddle.png" width = '50px' height = '50px' alt=""></div>
 
 
-		
+			
 
-	</div>
-				<a id = 'instructions' href="">Click For Instructions</a>
+		</div><br>
 
-		<div>
-			<h3 id='userScore'>User Score: 0</h3><br>
-			<h3 id='compScore'>Computer Score: 0</h3>
+
+
+			<canvas id ='numCanvas' width='200' height = '200'></canvas>
+			<div>
+				<h3 id='userScore'>User Score: 0</h3><br>
+				<h3 id='compScore'>Computer Score: 0</h3>
+			</div> <br>
+			<a id = "instructions" href="">Click For Instructions</a><br><br><br>
+
+
+		<div id ='canvasHolderDiv'>
+
+				<canvas id ='gameCanvas' width = '800' height='600'></canvas>
+				<br>
+				<button id = 'pauseButton'>Pause</button> ----
+				<button id = 'resumeButton'>Resume</button>
 		</div>
-		<canvas id ='numCanvas' width='200' height = '200'></canvas>
-			<div id ='canvasHolderDiv'>
-
-		<!-- <div id ='courtLineDiv'> -->
-			<canvas id ='gameCanvas' width = '800' height='600'></canvas>
-			<br>
-			<button id = 'pauseButton'>Pause</button> ----
-			<button id = 'resumeButton'>Resume</button>
-		<!-- </div> -->
 	</div>
-</div>
+<!-- START canvas placement practice -->
+<!-- 
+	<canvas id="lower" width="900" height="550" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+	<canvas id="upper" width="900" height="550" style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas> -->
+
+<!-- END canvas placement practice -->
+
 </body>
 
 <script>
-	}
+	
 </script>
 </html>
 
