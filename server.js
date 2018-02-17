@@ -14,7 +14,8 @@ app.use(express.static(path.join(__dirname, './client')));
 app.use(express.static(path.join(__dirname, './node_modules')));
 app.use(express.static(path.join(__dirname, './static')));
 app.get('/test', function(req, res){
-
+  var askingIP = req.connection.remoteAddress;
+  console.log('IP',req.connection.remoteAddress)
 	res.json({bame:'Gaston', age: 47});
 
 })
